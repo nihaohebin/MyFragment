@@ -1,0 +1,142 @@
+package cn.fragmention.demo_flow.ui.fragment.home;
+
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.view.GravityCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+import cn.fragmention.R;
+import cn.fragmention.demo_flow.adapter.HomeAdapter;
+import cn.fragmention.demo_flow.base.BaseMainFragment;
+import cn.fragmention.demo_flow.entity.Article;
+import cn.fragmention.demo_flow.listener.OnItemClickListener;
+import me.yokeyword.fragmentation.ISupportActivity;
+import me.yokeyword.fragmentation.anim.DefaultHorizontalAnimator;
+import me.yokeyword.fragmentation.anim.DefaultNoAnimator;
+import me.yokeyword.fragmentation.anim.DefaultVerticalAnimator;
+
+
+public class HomeFragment extends BaseMainFragment implements Toolbar.OnMenuItemClickListener {
+    private static final String TAG = "Fragmentation";
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.recy)
+    RecyclerView mRecy;
+    Unbinder unbinder;
+
+    private String[] mTitles;
+
+    private String[] mContents;
+
+    private HomeAdapter mAdapter;
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        unbinder = ButterKnife.bind(this, view);
+        initView();
+        //        动态改动 当前Fragment的动画
+        //        setFragmentAnimator(fragmentAnimator);
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    public static HomeFragment newInstance() {
+        return new HomeFragment();
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_anim:
+                final PopupMenu popupMenu = new PopupMenu(_mActivity, mToolbar, GravityCompat.END);
+                popupMenu.inflate(R.menu.home_pop);
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.action_anim_veritical:
+                                ((ISupportActivity) _mActivity).setFragmentAnimator(new DefaultVerticalAnimator());
+                                Toast.makeText(_mActivity, R.string.anim_v, Toast.LENGTH_SHORT).show();
+                                break;
+                            case R.id.action_anim_horizontal:
+                                ((ISupportActivity) _mActivity).setFragmentAnimator(new DefaultHorizontalAnimator());
+                                Toast.makeText(_mActivity, R.string.anim_h, Toast.LENGTH_SHORT).show();
+                                break;
+                            case R.id.action_anim_none:
+                                ((ISupportActivity) _mActivity).setFragmentAnimator(new DefaultNoAnimator());
+                                Toast.makeText(_mActivity, R.string.anim_none, Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                        popupMenu.dismiss();
+                        return true;
+                    }
+                });
+                popupMenu.show();
+                break;
+        }
+        return true;
+    }
+
+    private void initView() {
+
+        mTitles = getResources().getStringArray(R.array.array_title);
+        mContents = getResources().getStringArray(R.array.array_content);
+
+        mToolbar.setTitle(R.string.home);
+        initToolbarNav(mToolbar, true);
+        mToolbar.inflateMenu(R.menu.home);
+        mToolbar.setOnMenuItemClickListener(this);
+
+        mAdapter = new HomeAdapter(_mActivity);
+        LinearLayoutManager manager = new LinearLayoutManager(_mActivity);
+        mRecy.setLayoutManager(manager);
+        mRecy.setAdapter(mAdapter);
+
+        mAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(int position, View view) {
+                start(DetailFragment.newInstance(mAdapter.getItem(position).getTitle()));
+            }
+        });
+
+        // Init Datas
+        List<Article> articleList = new ArrayList<>();
+        for (int i = 0; i < 15; i++) {
+            int index = (int) (Math.random() * 3);
+            Article article = new Article(mTitles[index], mContents[index]);
+            articleList.add(article);
+        }
+        mAdapter.setDatas(articleList);
+    }
+
+    /**
+     * 类似于 Activity的 onNewIntent()
+     */
+    @Override
+    public void onNewBundle(Bundle args) {
+        super.onNewBundle(args);
+
+        Toast.makeText(_mActivity, args.getString("from"), Toast.LENGTH_SHORT).show();
+    }
+
+}
