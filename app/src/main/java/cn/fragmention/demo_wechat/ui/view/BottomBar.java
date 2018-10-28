@@ -50,9 +50,9 @@ public class BottomBar extends LinearLayout {
     private void init(Context context, AttributeSet attrs) {
         setOrientation(VERTICAL);
 
-//        ImageView shadowView = new ImageView(context);
-//        shadowView.setBackgroundResource(R.drawable.actionbar_shadow_up);
-//        addView(shadowView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        //        ImageView shadowView = new ImageView(context);
+        //        shadowView.setBackgroundResource(R.drawable.actionbar_shadow_up);
+        //        addView(shadowView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         mTabLayout = new LinearLayout(context);
         mTabLayout.setBackgroundColor(Color.WHITE);
@@ -67,7 +67,8 @@ public class BottomBar extends LinearLayout {
         tab.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mListener == null) return;
+                if (mListener == null)
+                    return;
 
                 int pos = tab.getTabPosition();
                 if (mCurrentPosition == pos) {
@@ -109,7 +110,8 @@ public class BottomBar extends LinearLayout {
      * 获取 Tab
      */
     public BottomBarTab getItem(int index) {
-        if (mTabs.size() < index) return null;
+        if (mTabs.size() < index)
+            return null;
         return mTabs.get(index);
     }
 

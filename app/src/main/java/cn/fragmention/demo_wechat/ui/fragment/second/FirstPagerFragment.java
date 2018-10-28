@@ -1,6 +1,7 @@
 package cn.fragmention.demo_wechat.ui.fragment.second;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +15,9 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import cn.fragmention.R;
 import cn.fragmention.demo_wechat.adapter.PagerAdapter;
 import cn.fragmention.demo_wechat.event.TabSelectedEvent;
@@ -26,61 +30,65 @@ import me.yokeyword.fragmentation.SupportFragment;
  * Created by YoKeyword on 16/6/30.
  */
 public class FirstPagerFragment extends SupportFragment implements SwipeRefreshLayout.OnRefreshListener {
-    private SwipeRefreshLayout mRefreshLayout;
-    private RecyclerView mRecy;
-    private PagerAdapter mAdapter;
+
+    @BindView(R.id.recy)
+    RecyclerView mRecy;
+    @BindView(R.id.refresh_layout)
+    SwipeRefreshLayout mRefreshLayout;
+    Unbinder unbinder;
 
     private boolean mInAtTop = true;
     private int mScrollTotal;
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.wechat_fragment_tab_second_pager_first, container, false);
+        unbinder = ButterKnife.bind(this, view);
+        initView();
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBusActivityScope.getDefault(_mActivity).unregister(this);
+        unbinder.unbind();
+    }
+
     public static FirstPagerFragment newInstance() {
 
         Bundle args = new Bundle();
-
         FirstPagerFragment fragment = new FirstPagerFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate( R.layout.wechat_fragment_tab_second_pager_first, container, false);
-        initView(view);
-        return view;
-    }
+    private void initView() {
 
-    private void initView(View view) {
         EventBusActivityScope.getDefault(_mActivity).register(this);
-
-        mRecy = (RecyclerView) view.findViewById( R.id.recy);
-        mRefreshLayout = (SwipeRefreshLayout) view.findViewById( R.id.refresh_layout);
-
         mRefreshLayout.setOnRefreshListener(this);
-
-        mAdapter = new PagerAdapter(_mActivity);
+        PagerAdapter adapter = new PagerAdapter(_mActivity);
         mRecy.setHasFixedSize(true);
         LinearLayoutManager manager = new LinearLayoutManager(_mActivity);
         mRecy.setLayoutManager(manager);
-        mRecy.setAdapter(mAdapter);
+        mRecy.setAdapter(adapter);
 
         mRecy.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 mScrollTotal += dy;
-                if (mScrollTotal <= 0) {
-                    mInAtTop = true;
-                } else {
-                    mInAtTop = false;
-                }
+                mInAtTop = mScrollTotal <= 0;
             }
         });
 
-        mAdapter.setOnItemClickListener(new OnItemClickListener() {
+        adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(int position, View view, RecyclerView.ViewHolder holder) {
                 // 通知MainFragment跳转至NewFeatureFragment
+                assert getParentFragment() != null;
+                assert getParentFragment().getParentFragment() != null;
                 ((MainFragment) getParentFragment().getParentFragment()).startBrotherFragment(NewFeatureFragment.newInstance());
             }
         });
@@ -91,7 +99,7 @@ public class FirstPagerFragment extends SupportFragment implements SwipeRefreshL
             String item = "New features";
             items.add(item);
         }
-        mAdapter.setDatas(items);
+        adapter.setDatas(items);
     }
 
     @Override
@@ -109,7 +117,8 @@ public class FirstPagerFragment extends SupportFragment implements SwipeRefreshL
      */
     @Subscribe
     public void onTabSelectedEvent(TabSelectedEvent event) {
-        if (event.position != MainFragment.SECOND) return;
+        if (event.position != MainFragment.SECOND)
+            return;
 
         if (mInAtTop) {
             mRefreshLayout.setRefreshing(true);
@@ -123,9 +132,4 @@ public class FirstPagerFragment extends SupportFragment implements SwipeRefreshL
         mRecy.smoothScrollToPosition(0);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        EventBusActivityScope.getDefault(_mActivity).unregister(this);
-    }
 }

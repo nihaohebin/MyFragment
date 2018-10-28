@@ -1,6 +1,7 @@
 package cn.fragmention.demo_wechat.adapter;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +11,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.fragmention.demo_wechat.listener.OnItemClickListener;
 import cn.fragmention.R;
+import cn.fragmention.demo_wechat.listener.OnItemClickListener;
 
 /**
  * Created by YoKeyword on 16/6/30.
@@ -32,9 +33,10 @@ public class PagerAdapter extends RecyclerView.Adapter<PagerAdapter.MyViewHolder
         notifyDataSetChanged();
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mInflater.inflate( R.layout.item_pager, parent, false);
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = mInflater.inflate(R.layout.item_pager, parent, false);
         final MyViewHolder holder = new MyViewHolder(view);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,9 +64,9 @@ public class PagerAdapter extends RecyclerView.Adapter<PagerAdapter.MyViewHolder
     class MyViewHolder extends RecyclerView.ViewHolder {
         private TextView tvTitle;
 
-        public MyViewHolder(View itemView) {
+        MyViewHolder(View itemView) {
             super(itemView);
-            tvTitle = (TextView) itemView.findViewById( R.id.tv_title);
+            tvTitle = itemView.findViewById(R.id.tv_title);
         }
     }
 

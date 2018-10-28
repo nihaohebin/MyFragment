@@ -12,6 +12,7 @@ import cn.fragmention.demo_wechat.ui.fragment.second.OtherPagerFragment;
  * Created by YoKeyword on 16/6/5.
  */
 public class WechatPagerFragmentAdapter extends FragmentPagerAdapter {
+
     private String[] mTitles;
 
     public WechatPagerFragmentAdapter(FragmentManager fm, String... titles) {

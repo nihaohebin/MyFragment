@@ -1,12 +1,18 @@
 package cn.fragmention.demo_wechat.ui.fragment.second;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
 import cn.fragmention.R;
 import cn.fragmention.demo_wechat.base.BaseBackFragment;
 import cn.fragmention.demo_wechat.ui.fragment.CycleFragment;
@@ -17,43 +23,34 @@ import cn.fragmention.demo_wechat.ui.fragment.CycleFragment;
  * Created by YoKey on 16/11/25.
  */
 public class NewFeatureFragment extends BaseBackFragment {
-    public static NewFeatureFragment newInstance() {
-        return new NewFeatureFragment();
-    }
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.btn_start)
+    Button btnStart;
+    @BindView(R.id.btn_start_dont_hide)
+    Button btnStartDontHide;
+    Unbinder unbinder;
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate( R.layout.wechat_fragment_new_feature, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.wechat_fragment_new_feature, container, false);
+        unbinder = ButterKnife.bind(this, attachToSwipeBack(view));
 
-        Toolbar toolbar = (Toolbar) view.findViewById( R.id.toolbar);
         initToolbarNav(toolbar);
         toolbar.setTitle("NewFeatures");
-
-        // 自定义动画启动一个Fragment，并且不隐藏自己
-        view.findViewById( R.id.btn_start_dont_hide).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                extraTransaction()
-                        .setCustomAnimations( R.anim.v_fragment_enter, 0, 0,  R.anim.v_fragment_exit)
-                        .startDontHideSelf(ViewFragment.newInstance());
-            }
-        });
-
-        // 自定义动画启动一个Fragment
-        view.findViewById( R.id.btn_start).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                extraTransaction()
-//                        .setTag("CustomTag")
-//                        . ...
-                        .setCustomAnimations( R.anim.v_fragment_enter,  R.anim.v_fragment_pop_exit,
-                                 R.anim.v_fragment_pop_enter,  R.anim.v_fragment_exit)
-                        .start(CycleFragment.newInstance(0));
-            }
-        });
-
         return attachToSwipeBack(view);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    public static NewFeatureFragment newInstance() {
+        return new NewFeatureFragment();
     }
 
     @Override
@@ -75,5 +72,26 @@ public class NewFeatureFragment extends BaseBackFragment {
         super.onSupportInvisible();
         // 当对用户不可见时 回调
         // 不管是 父Fragment还是子Fragment 都有效！
+    }
+
+    @OnClick({R.id.btn_start, R.id.btn_start_dont_hide})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            // 自定义动画启动一个Fragment，并且不隐藏自己
+            case R.id.btn_start:
+                extraTransaction()
+                        //                        .setTag("CustomTag")
+                        //                        . ...
+                        .setCustomAnimations(R.anim.v_fragment_enter, R.anim.v_fragment_pop_exit,
+                                R.anim.v_fragment_pop_enter, R.anim.v_fragment_exit)
+                        .start(CycleFragment.newInstance(0));
+                break;
+            // 自定义动画启动一个Fragment
+            case R.id.btn_start_dont_hide:
+                extraTransaction()
+                        .setCustomAnimations(R.anim.v_fragment_enter, 0, 0, R.anim.v_fragment_exit)
+                        .startDontHideSelf(ViewFragment.newInstance());
+                break;
+        }
     }
 }

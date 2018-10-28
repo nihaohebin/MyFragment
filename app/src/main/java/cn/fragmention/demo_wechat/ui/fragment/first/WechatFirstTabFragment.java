@@ -2,6 +2,7 @@ package cn.fragmention.demo_wechat.ui.fragment.first;
 
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +18,9 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import cn.fragmention.R;
 import cn.fragmention.demo_wechat.adapter.ChatAdapter;
 import cn.fragmention.demo_wechat.base.BaseMainFragment;
@@ -30,40 +34,51 @@ import me.yokeyword.eventbusactivityscope.EventBusActivityScope;
  * Created by YoKeyword on 16/6/30.
  */
 public class WechatFirstTabFragment extends BaseMainFragment implements SwipeRefreshLayout.OnRefreshListener {
-    private Toolbar mToolbar;
-    private SwipeRefreshLayout mRefreshLayout;
-    private RecyclerView mRecy;
+
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.recy)
+    RecyclerView mRecy;
+    @BindView(R.id.refresh_layout)
+    SwipeRefreshLayout mRefreshLayout;
+    Unbinder unbinder;
 
     private boolean mInAtTop = true;
     private int mScrollTotal;
-
     private ChatAdapter mAdapter;
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.wechat_fragment_tab_first, container, false);
+        unbinder = ButterKnife.bind(this, view);
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initView();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBusActivityScope.getDefault(_mActivity).unregister(this);
+        unbinder.unbind();
+    }
+
     public static WechatFirstTabFragment newInstance() {
-
         Bundle args = new Bundle();
-
         WechatFirstTabFragment fragment = new WechatFirstTabFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate( R.layout.wechat_fragment_tab_first, container, false);
-        initView(view);
-        return view;
-    }
-
-    private void initView(View view) {
-        mToolbar = (Toolbar) view.findViewById( R.id.toolbar);
-        mRefreshLayout = (SwipeRefreshLayout) view.findViewById( R.id.refresh_layout);
-        mRecy = (RecyclerView) view.findViewById( R.id.recy);
+    private void initView() {
 
         EventBusActivityScope.getDefault(_mActivity).register(this);
-
-        mToolbar.setTitle( R.string.home);
+        mToolbar.setTitle(R.string.home);
     }
 
     @Override
@@ -76,7 +91,7 @@ public class WechatFirstTabFragment extends BaseMainFragment implements SwipeRef
         final int space = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 0.5f, getResources().getDisplayMetrics());
         mRecy.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
-            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
                 outRect.set(0, 0, 0, space);
             }
         });
@@ -85,14 +100,10 @@ public class WechatFirstTabFragment extends BaseMainFragment implements SwipeRef
 
         mRecy.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 mScrollTotal += dy;
-                if (mScrollTotal <= 0) {
-                    mInAtTop = true;
-                } else {
-                    mInAtTop = false;
-                }
+                mInAtTop = mScrollTotal <= 0;
             }
         });
 
@@ -102,7 +113,8 @@ public class WechatFirstTabFragment extends BaseMainFragment implements SwipeRef
                 // 因为启动的MsgFragment是MainFragment的兄弟Fragment,所以需要MainFragment.start()
 
                 // 也可以像使用getParentFragment()的方式,拿到父Fragment来操作 或者使用 EventBusActivityScope
-              ((MainFragment) getParentFragment()).startBrotherFragment(MsgFragment.newInstance(mAdapter.getMsg(position)));
+                assert getParentFragment() != null;
+                ((MainFragment) getParentFragment()).startBrotherFragment(MsgFragment.newInstance(mAdapter.getMsg(position)));
             }
         });
 
@@ -142,7 +154,8 @@ public class WechatFirstTabFragment extends BaseMainFragment implements SwipeRef
      */
     @Subscribe
     public void onTabSelectedEvent(TabSelectedEvent event) {
-        if (event.position != MainFragment.FIRST) return;
+        if (event.position != MainFragment.FIRST)
+            return;
 
         if (mInAtTop) {
             mRefreshLayout.setRefreshing(true);
@@ -156,9 +169,4 @@ public class WechatFirstTabFragment extends BaseMainFragment implements SwipeRef
         mRecy.smoothScrollToPosition(0);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        EventBusActivityScope.getDefault(_mActivity).unregister(this);
-    }
 }

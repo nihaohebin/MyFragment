@@ -1,5 +1,6 @@
 package cn.fragmention.demo_wechat.ui.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -21,7 +22,9 @@ import cn.fragmention.R;
 /**
  * Created by YoKeyword on 16/6/3.
  */
+@SuppressLint("ViewConstructor")
 public class BottomBarTab extends FrameLayout {
+
     private ImageView mIcon;
     private TextView mTvTitle;
     private Context mContext;
@@ -44,7 +47,7 @@ public class BottomBarTab extends FrameLayout {
 
     private void init(Context context, int icon, CharSequence title) {
         mContext = context;
-        TypedArray typedArray = context.obtainStyledAttributes(new int[]{ R.attr.selectableItemBackgroundBorderless});
+        TypedArray typedArray = context.obtainStyledAttributes(new int[]{R.attr.selectableItemBackgroundBorderless});
         Drawable drawable = typedArray.getDrawable(0);
         setBackgroundDrawable(drawable);
         typedArray.recycle();
@@ -61,7 +64,7 @@ public class BottomBarTab extends FrameLayout {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size, size);
         mIcon.setImageResource(icon);
         mIcon.setLayoutParams(params);
-        mIcon.setColorFilter(ContextCompat.getColor(context,  R.color.tab_unselect));
+        mIcon.setColorFilter(ContextCompat.getColor(context, R.color.tab_unselect));
         lLContainer.addView(mIcon);
 
         mTvTitle = new TextView(context);
@@ -69,7 +72,7 @@ public class BottomBarTab extends FrameLayout {
         LinearLayout.LayoutParams paramsTv = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         paramsTv.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
         mTvTitle.setTextSize(10);
-        mTvTitle.setTextColor(ContextCompat.getColor(context,  R.color.tab_unselect));
+        mTvTitle.setTextColor(ContextCompat.getColor(context, R.color.tab_unselect));
         mTvTitle.setLayoutParams(paramsTv);
         lLContainer.addView(mTvTitle);
 
@@ -78,7 +81,7 @@ public class BottomBarTab extends FrameLayout {
         int min = dip2px(context, 20);
         int padding = dip2px(context, 5);
         mTvUnreadCount = new TextView(context);
-        mTvUnreadCount.setBackgroundResource( R.drawable.bg_msg_bubble);
+        mTvUnreadCount.setBackgroundResource(R.drawable.bg_msg_bubble);
         mTvUnreadCount.setMinWidth(min);
         mTvUnreadCount.setTextColor(Color.WHITE);
         mTvUnreadCount.setPadding(padding, 0, padding, 0);
@@ -97,11 +100,11 @@ public class BottomBarTab extends FrameLayout {
     public void setSelected(boolean selected) {
         super.setSelected(selected);
         if (selected) {
-            mIcon.setColorFilter(ContextCompat.getColor(mContext,  R.color.colorPrimary));
-            mTvTitle.setTextColor(ContextCompat.getColor(mContext,  R.color.colorPrimary));
+            mIcon.setColorFilter(ContextCompat.getColor(mContext, R.color.colorPrimary));
+            mTvTitle.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
         } else {
-            mIcon.setColorFilter(ContextCompat.getColor(mContext,  R.color.tab_unselect));
-            mTvTitle.setTextColor(ContextCompat.getColor(mContext,  R.color.tab_unselect));
+            mIcon.setColorFilter(ContextCompat.getColor(mContext, R.color.tab_unselect));
+            mTvTitle.setTextColor(ContextCompat.getColor(mContext, R.color.tab_unselect));
         }
     }
 
@@ -119,6 +122,7 @@ public class BottomBarTab extends FrameLayout {
     /**
      * 设置未读数量
      */
+    @SuppressLint("SetTextI18n")
     public void setUnreadCount(int num) {
         if (num <= 0) {
             mTvUnreadCount.setText(String.valueOf(0));

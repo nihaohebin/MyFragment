@@ -1,11 +1,15 @@
 package cn.fragmention.demo_wechat.ui.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import cn.fragmention.R;
 import cn.fragmention.demo_wechat.event.TabSelectedEvent;
 import cn.fragmention.demo_wechat.ui.fragment.first.WechatFirstTabFragment;
@@ -21,49 +25,47 @@ import me.yokeyword.fragmentation.SupportFragment;
  */
 public class MainFragment extends SupportFragment {
     private static final int REQ_MSG = 10;
-
     public static final int FIRST = 0;
     public static final int SECOND = 1;
     public static final int THIRD = 2;
 
+    @BindView(R.id.bottomBar)
+    BottomBar mBottomBar;
+    Unbinder unbinder;
+
     private SupportFragment[] mFragments = new SupportFragment[3];
 
-    private BottomBar mBottomBar;
-
-
-    public static MainFragment newInstance() {
-
-        Bundle args = new Bundle();
-
-        MainFragment fragment = new MainFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate( R.layout.wechat_fragment_main, container, false);
-        initView(view);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.wechat_fragment_main, container, false);
+        unbinder = ButterKnife.bind(this, view);
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initView();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         SupportFragment firstFragment = findChildFragment(WechatFirstTabFragment.class);
+
         if (firstFragment == null) {
             mFragments[FIRST] = WechatFirstTabFragment.newInstance();
             mFragments[SECOND] = WechatSecondTabFragment.newInstance();
             mFragments[THIRD] = WechatThirdTabFragment.newInstance();
 
-            loadMultipleRootFragment( R.id.fl_tab_container, FIRST,
+            loadMultipleRootFragment(R.id.fl_tab_container, FIRST,
                     mFragments[FIRST],
                     mFragments[SECOND],
                     mFragments[THIRD]);
         } else {
             // 这里库已经做了Fragment恢复,所有不需要额外的处理了, 不会出现重叠问题
-
             // 这里我们需要拿到mFragments的引用
             mFragments[FIRST] = firstFragment;
             mFragments[SECOND] = findChildFragment(WechatSecondTabFragment.class);
@@ -71,13 +73,18 @@ public class MainFragment extends SupportFragment {
         }
     }
 
-    private void initView(View view) {
-        mBottomBar = (BottomBar) view.findViewById( R.id.bottomBar);
+    public static MainFragment newInstance() {
+        Bundle args = new Bundle();
+        MainFragment fragment = new MainFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
-        mBottomBar
-                .addItem(new BottomBarTab(_mActivity,  R.drawable.ic_message_white_24dp, getString( R.string.msg)))
-                .addItem(new BottomBarTab(_mActivity,  R.drawable.ic_account_circle_white_24dp, getString( R.string.discover)))
-                .addItem(new BottomBarTab(_mActivity,  R.drawable.ic_discover_white_24dp, getString( R.string.more)));
+    private void initView() {
+
+        mBottomBar.addItem(new BottomBarTab(_mActivity, R.drawable.ic_message_white_24dp, getString(R.string.msg)))
+                .addItem(new BottomBarTab(_mActivity, R.drawable.ic_account_circle_white_24dp, getString(R.string.discover)))
+                .addItem(new BottomBarTab(_mActivity, R.drawable.ic_discover_white_24dp, getString(R.string.more)));
 
         // 模拟未读消息
         mBottomBar.getItem(FIRST).setUnreadCount(9);
@@ -122,5 +129,11 @@ public class MainFragment extends SupportFragment {
      */
     public void startBrotherFragment(SupportFragment targetFragment) {
         start(targetFragment);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }

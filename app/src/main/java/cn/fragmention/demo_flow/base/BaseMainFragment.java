@@ -36,8 +36,7 @@ public class BaseMainFragment extends BaseSupportFragment {
         if (context instanceof OnFragmentOpenDrawerListener) {
             mOpenDraweListener = (OnFragmentOpenDrawerListener) context;
         } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentOpenDrawerListener");
+//            throw new RuntimeException(context.toString()  + " must implement OnFragmentOpenDrawerListener");
         }
     }
 
