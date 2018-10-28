@@ -41,7 +41,7 @@ public class FirstSwipeBackFragment extends BaseSwipeBackFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_swipe_back_first, container, false);
-        unbinder = ButterKnife.bind(this, attachToSwipeBack(view));
+        unbinder = ButterKnife.bind(this, view);
 
         mToolbar.setTitle("SwipeBackActivity's Fragment");
         _initToolbar(mToolbar);

@@ -31,7 +31,7 @@ public class RecyclerSwipeBackFragment extends BaseSwipeBackFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_swipe_back_recy, container, false);
-        unbinder = ButterKnife.bind(this, attachToSwipeBack(view));
+        unbinder = ButterKnife.bind(this, view);
         initView();
         return attachToSwipeBack(view);
     }

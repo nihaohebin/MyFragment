@@ -2,6 +2,7 @@ package cn.fragmention.demo_zhihu.ui.fragment.first.child;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -19,6 +20,9 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import cn.fragmention.R;
 import cn.fragmention.demo_zhihu.ZhiHu_MainActivity;
 import cn.fragmention.demo_zhihu.adapter.FirstHomeAdapter;
@@ -33,13 +37,17 @@ import me.yokeyword.fragmentation.SupportFragment;
  * Created by YoKeyword on 16/6/5.
  */
 public class FirstHomeFragment extends SupportFragment implements SwipeRefreshLayout.OnRefreshListener {
-    private Toolbar mToolbar;
-    private RecyclerView mRecy;
-    private SwipeRefreshLayout mRefreshLayout;
-    private FloatingActionButton mFab;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.recy)
+    RecyclerView mRecy;
+    @BindView(R.id.refresh_layout)
+    SwipeRefreshLayout mRefreshLayout;
+    @BindView(R.id.fab)
+    FloatingActionButton mFab;
+    Unbinder unbinder;
 
     private FirstHomeAdapter mAdapter;
-
     private boolean mInAtTop = true;
     private int mScrollTotal;
 
@@ -52,37 +60,39 @@ public class FirstHomeFragment extends SupportFragment implements SwipeRefreshLa
     };
 
     private int[] mImgRes = new int[]{
-             R.drawable.bg_first,  R.drawable.bg_second,  R.drawable.bg_third,  R.drawable.bg_fourth,  R.drawable.bg_fifth
+            R.drawable.bg_first, R.drawable.bg_second, R.drawable.bg_third, R.drawable.bg_fourth, R.drawable.bg_fifth
     };
 
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.zhihu_fragment_first_home, container, false);
+        unbinder = ButterKnife.bind(this, view);
+        EventBusActivityScope.getDefault(_mActivity).register(this);
+        initView();
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBusActivityScope.getDefault(_mActivity).unregister(this);
+        unbinder.unbind();
+    }
+
     public static FirstHomeFragment newInstance() {
-
         Bundle args = new Bundle();
-
         FirstHomeFragment fragment = new FirstHomeFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate( R.layout.zhihu_fragment_first_home, container, false);
-        EventBusActivityScope.getDefault(_mActivity).register(this);
-        initView(view);
-        return view;
-    }
+    private void initView() {
 
-    private void initView(View view) {
-        mToolbar = (Toolbar) view.findViewById( R.id.toolbar);
-        mRecy = (RecyclerView) view.findViewById( R.id.recy);
-        mRefreshLayout = (SwipeRefreshLayout) view.findViewById( R.id.refresh_layout);
-        mFab = (FloatingActionButton) view.findViewById( R.id.fab);
+        mToolbar.setTitle(R.string.home);
 
-        mToolbar.setTitle( R.string.home);
-
-        mRefreshLayout.setColorSchemeResources( R.color.colorPrimary);
+        mRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         mRefreshLayout.setOnRefreshListener(this);
 
         mAdapter = new FirstHomeAdapter(_mActivity);
@@ -106,7 +116,7 @@ public class FirstHomeFragment extends SupportFragment implements SwipeRefreshLa
                     // 25.1.0以下的support包,Material过渡动画只有在进栈时有,返回时没有;
                     // 25.1.0+的support包，SharedElement正常
                     extraTransaction()
-                            .addSharedElement(((FirstHomeAdapter.VH) vh).img, getString( R.string.image_transition))
+                            .addSharedElement(((FirstHomeAdapter.VH) vh).img, getString(R.string.image_transition))
                             .addSharedElement(((FirstHomeAdapter.VH) vh).tvTitle, "tv")
                             .start(fragment);
                 } else {
@@ -129,11 +139,7 @@ public class FirstHomeFragment extends SupportFragment implements SwipeRefreshLa
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 mScrollTotal += dy;
-                if (mScrollTotal <= 0) {
-                    mInAtTop = true;
-                } else {
-                    mInAtTop = false;
-                }
+                mInAtTop = mScrollTotal <= 0;
                 if (dy > 5) {
                     mFab.hide();
                 } else if (dy < -5) {
@@ -169,7 +175,8 @@ public class FirstHomeFragment extends SupportFragment implements SwipeRefreshLa
      */
     @Subscribe
     public void onTabSelectedEvent(TabSelectedEvent event) {
-        if (event.position != ZhiHu_MainActivity.FIRST) return;
+        if (event.position != ZhiHu_MainActivity.FIRST)
+            return;
 
         if (mInAtTop) {
             mRefreshLayout.setRefreshing(true);
@@ -179,9 +186,4 @@ public class FirstHomeFragment extends SupportFragment implements SwipeRefreshLa
         }
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        EventBusActivityScope.getDefault(_mActivity).unregister(this);
-    }
 }

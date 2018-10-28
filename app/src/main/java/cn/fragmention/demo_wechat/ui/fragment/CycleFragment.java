@@ -50,7 +50,7 @@ public class CycleFragment extends BaseBackFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_cycle, container, false);
-        unbinder = ButterKnife.bind(this, attachToSwipeBack(view));
+        unbinder = ButterKnife.bind(this, view);
         initView();
         return attachToSwipeBack(view);
     }

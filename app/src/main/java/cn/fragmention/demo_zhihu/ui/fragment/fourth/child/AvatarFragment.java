@@ -1,6 +1,7 @@
 package cn.fragmention.demo_zhihu.ui.fragment.fourth.child;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,9 +16,7 @@ import cn.fragmention.R;
 public class AvatarFragment extends SupportFragment {
 
     public static AvatarFragment newInstance() {
-
         Bundle args = new Bundle();
-
         AvatarFragment fragment = new AvatarFragment();
         fragment.setArguments(args);
         return fragment;
@@ -25,8 +24,7 @@ public class AvatarFragment extends SupportFragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate( R.layout.zhihu_fragment_fourth_avatar, container, false);
-        return view;
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate( R.layout.zhihu_fragment_fourth_avatar, container, false);
     }
 }

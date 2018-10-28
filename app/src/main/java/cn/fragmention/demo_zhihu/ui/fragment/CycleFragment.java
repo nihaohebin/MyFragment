@@ -1,6 +1,7 @@
 package cn.fragmention.demo_zhihu.ui.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -9,6 +10,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
 import cn.fragmention.R;
 import cn.fragmention.demo_zhihu.base.BaseBackFragment;
 
@@ -17,20 +22,17 @@ import cn.fragmention.demo_zhihu.base.BaseBackFragment;
  */
 public class CycleFragment extends BaseBackFragment {
     private static final String ARG_NUMBER = "arg_number";
-
-    private Toolbar mToolbar;
-    private TextView mTvName;
-    private Button mBtnNext, mBtnNextWithFinish;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.tv_name)
+    TextView mTvName;
+    @BindView(R.id.btn_next_with_finish)
+    Button mBtnNextWithFinish;
+    @BindView(R.id.btn_next)
+    Button mBtnNext;
+    Unbinder unbinder;
 
     private int mNumber;
-
-    public static CycleFragment newInstance(int number) {
-        CycleFragment fragment = new CycleFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_NUMBER, number);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,36 +45,46 @@ public class CycleFragment extends BaseBackFragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate( R.layout.fragment_cycle, container, false);
-        initView(view);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_cycle, container, false);
+        unbinder = ButterKnife.bind(this, view);
+        initView();
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
 
-    private void initView(View view) {
-        mToolbar = (Toolbar) view.findViewById( R.id.toolbar);
-        mTvName = (TextView) view.findViewById( R.id.tv_name);
-        mBtnNext = (Button) view.findViewById( R.id.btn_next);
-        mBtnNextWithFinish = (Button) view.findViewById( R.id.btn_next_with_finish);
+    public static CycleFragment newInstance(int number) {
+        CycleFragment fragment = new CycleFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_NUMBER, number);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+
+    private void initView() {
 
         String title = "CyclerFragment " + mNumber;
-
         mToolbar.setTitle(title);
         initToolbarNav(mToolbar);
 
         mTvName.setText(title);
-        mBtnNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                start(CycleFragment.newInstance(mNumber + 1));
-            }
-        });
-        mBtnNextWithFinish.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    }
+
+    @OnClick({R.id.btn_next_with_finish, R.id.btn_next})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btn_next_with_finish:
                 startWithPop(CycleFragment.newInstance(mNumber + 1));
-            }
-        });
+                break;
+            case R.id.btn_next:
+                start(CycleFragment.newInstance(mNumber + 1));
+                break;
+        }
     }
 }

@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import cn.fragmention.R;
 import cn.fragmention.demo_zhihu.base.BaseMainFragment;
 import cn.fragmention.demo_zhihu.event.TabSelectedEvent;
@@ -26,19 +28,22 @@ import me.yokeyword.fragmentation.SupportFragment;
  * Created by YoKeyword on 16/6/2.
  */
 public class ZhiHu_MainActivity extends SupportActivity implements BaseMainFragment.OnBackToFirstListener {
+
     public static final int FIRST = 0;
     public static final int SECOND = 1;
     public static final int THIRD = 2;
     public static final int FOURTH = 3;
 
-    private SupportFragment[] mFragments = new SupportFragment[4];
+    @BindView(R.id.bottomBar)
+    BottomBar mBottomBar;
 
-    private BottomBar mBottomBar;
+    private SupportFragment[] mFragments = new SupportFragment[4];
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.zhihu_activity_main);
+        ButterKnife.bind(this);
 
         SupportFragment firstFragment = findFragment(ZhihuFirstFragment.class);
         if (firstFragment == null) {
@@ -66,7 +71,6 @@ public class ZhiHu_MainActivity extends SupportActivity implements BaseMainFragm
     }
 
     private void initView() {
-        mBottomBar = (BottomBar) findViewById(R.id.bottomBar);
 
         mBottomBar.addItem(new BottomBarTab(this, R.drawable.ic_home_white_24dp))
                 .addItem(new BottomBarTab(this, R.drawable.ic_discover_white_24dp))
@@ -103,7 +107,6 @@ public class ZhiHu_MainActivity extends SupportActivity implements BaseMainFragm
                     return;
                 }
 
-
                 // 这里推荐使用EventBus来实现 -> 解耦
                 if (count == 1) {
                     // 在FirstPagerFragment中接收, 因为是嵌套的孙子Fragment 所以用EventBus比较方便
@@ -127,16 +130,4 @@ public class ZhiHu_MainActivity extends SupportActivity implements BaseMainFragm
     public void onBackToFirstFragment() {
         mBottomBar.setCurrentItem(0);
     }
-
-    /**
-     * 这里暂没实现,忽略
-     */
-//    @Subscribe
-//    public void onHiddenBottombarEvent(boolean hidden) {
-//        if (hidden) {
-//            mBottomBar.hide();
-//        } else {
-//            mBottomBar.show();
-//        }
-//    }
 }
