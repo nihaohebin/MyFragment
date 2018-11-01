@@ -23,7 +23,6 @@ public class FApp extends MultiDexApplication {
         initFragmention();
 
         initLogger();
-
     }
 
     private void initFragmention() {
