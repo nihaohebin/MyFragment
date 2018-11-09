@@ -59,14 +59,12 @@ public class ZhiHu_MainActivity extends SupportActivity implements BaseMainFragm
                     mFragments[FOURTH]);
         } else {
             // 这里库已经做了Fragment恢复,所有不需要额外的处理了, 不会出现重叠问题
-
             // 这里我们需要拿到mFragments的引用
             mFragments[FIRST] = firstFragment;
             mFragments[SECOND] = findFragment(ZhihuSecondFragment.class);
             mFragments[THIRD] = findFragment(ZhihuThirdFragment.class);
             mFragments[FOURTH] = findFragment(ZhihuFourthFragment.class);
         }
-
         initView();
     }
 

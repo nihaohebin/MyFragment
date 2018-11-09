@@ -18,8 +18,7 @@ public abstract class BaseMainFragment extends SupportFragment {
         if (context instanceof OnBackToFirstListener) {
             _mBackToFirstListener = (OnBackToFirstListener) context;
         } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnBackToFirstListener");
+            throw new RuntimeException(context.toString()  + " must implement OnBackToFirstListener");
         }
     }
 
@@ -32,7 +31,6 @@ public abstract class BaseMainFragment extends SupportFragment {
     /**
      * 处理回退事件
      *
-     * @return
      */
     @Override
     public boolean onBackPressedSupport() {
